@@ -1,13 +1,36 @@
-body {
-    font-family: 'Noto Sans TC', sans-serif;
+body{
+	font-family: 'Noto Sans TC', sans-serif;
 }
 
-h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
-    font-family: 'Noto Sans TC', sans-serif;
-    text-transform: none;
+h1, h2, h3, h4 ,h5 ,h6 , .h1, .h2, .h3, .h4, .h5, .h6 {
+	font-family: 'Noto Sans TC', sans-serif;
 }
 
 .subheading {
-    font-family: 'Noto Sans TC', sans-serif;
-    text-transform: none;
-}  
+	font-family: 'Noto Sans TC',sans-serif;
+}
+
+body{
+	text-transform: none;
+}
+
+h1, h2, h3, h4 ,h5 ,h6 , .h1, .h2, .h3, .h4, .h5, .h6 {
+	text-transform: none;
+}
+
+.subheading{
+	text-transform: none;
+}
+
+.bg-primary{
+	background-color:#6e7ae7!important;
+	background-image: url(../assets/img/green-gobbler.png);
+}
+
+.text-primary{
+	color: 	#00ffc8!important;
+}
+
+a{
+	color: 	#ff009d;
+}
