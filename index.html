@@ -22,6 +22,26 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Marcellus&display=swap"
     rel="stylesheet">
+  <style>
+   .time-animated-background {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#timeCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+   </style>
+      
     
     
 </head>
@@ -157,15 +177,14 @@
 
   <div class="search-popup">
     <div class="search-popup-container">
-
-      <form role="search" method="get" class="form-group" action="">
-        <input type="search" id="search-form" class="form-control border-0 border-bottom"
-          placeholder="Type and press enter" value="" name="s" />
-        <button type="submit" class="search-submit border-0 position-absolute bg-white"
-          style="top: 15px;right: 15px;"><svg class="search" width="24" height="24">
-            <use xlink:href="#search"></use>
-          </svg></button>
-      </form>
+      <a href="https://www.youtube.com/@zilu_kongroufan" target="_blank"
+         class="search-submit border-0 position-absolute bg-white"
+         style="top: 15px; right: 15px;">
+        <svg class="search" width="24" height="24">
+          <use xlink:href="#search"></use>
+        </svg>
+      </a>
+    </div>
 
       <h5 class="cat-list-title">Browse Categories</h5>
 
@@ -280,55 +299,18 @@
 
             <div class="offcanvas-body">
               <ul class="navbar-nav justify-content-center flex-grow-1 gap-3">
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle active" href="#" id="dropdownAbout" data-bs-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">關於我們</a>
+                <li class="nav-item">
+                  <a class="nav-link" href="#collection">關於我們</a>
+                </li>
                   <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdownHome">
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Home Layout 1</a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Home Layout 2 </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Home Layout 3 </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Home Layout 4 </a>
-                    </li>
+                    
                   </ul>
                 </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="dropdownShop" data-bs-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">工具</a>
+                <li class="nav-item">
+                  <a class="nav-link" href="#tools">工具</a>
+                </li>
                   <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdownShop">
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Shop Sidebar </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Shop Three Column </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Shop Three Column Wide </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Shop Four Column </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Shop Four Column Wide </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Shop Six Column </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Shop Six Column Wide </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Single Product </a>
-                    </li>
-                    <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Single Product V2 </a>
-                    </li>
+         
                   </ul>
                 </li>
                 <li class="nav-item dropdown">
@@ -336,7 +318,7 @@
                     aria-haspopup="true" aria-expanded="false">訪談</a>
                   <ul class="dropdown-menu list-unstyled" aria-labelledby="dropdownBlog">
                     <li>
-                      <a href="index.html" class="dropdown-item item-anchor">Blog Classic </a>
+                      <a href="index.html" class="dropdown-item item-anchor">文字 </a>
                     </li>
                     <li>
                       <a href="index.html" class="dropdown-item item-anchor">Blog Grid with Sidebar </a>
@@ -427,7 +409,8 @@
               </a>
             </li>
             <li class="search-box" class="mx-2">
-              <a href="#search" class="search-button">
+              <a href="https://www.youtube.com/@zilu_kongroufan" target="_blank"
+   class="btn p-0 border-0 bg-transparent">
                 <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 50 50" width="50px" height="50px"><path d="M 44.898438 14.5 C 44.5 12.300781 42.601563 10.699219 40.398438 10.199219 C 37.101563 9.5 31 9 24.398438 9 C 17.800781 9 11.601563 9.5 8.300781 10.199219 C 6.101563 10.699219 4.199219 12.199219 3.800781 14.5 C 3.398438 17 3 20.5 3 25 C 3 29.5 3.398438 33 3.898438 35.5 C 4.300781 37.699219 6.199219 39.300781 8.398438 39.800781 C 11.898438 40.5 17.898438 41 24.5 41 C 31.101563 41 37.101563 40.5 40.601563 39.800781 C 42.800781 39.300781 44.699219 37.800781 45.101563 35.5 C 45.5 33 46 29.398438 46.101563 25 C 45.898438 20.5 45.398438 17 44.898438 14.5 Z M 19 32 L 19 18 L 31.199219 25 Z"/></svg>
               </a>
             </li>
@@ -440,9 +423,37 @@
   </nav>
 
   <!-- 倒數區塊 -->
-<section id="time-remaining" class="text-center my-5">
-  <h2>今日剩餘時間</h2>
-  <p id="countdown" style="font-size: 2rem; font-weight: bold;"></p>
+  
+  
+<section id="home-hero" class="hero-section text-center text-white">
+  <div class="time-background">
+    <svg id="particles" width="100%" height="100%">
+      <circle cx="10%" cy="20%" r="2"></circle>
+      <circle cx="30%" cy="50%" r="3"></circle>
+      <circle cx="60%" cy="80%" r="1.5"></circle>
+      <circle cx="80%" cy="40%" r="2.5"></circle>
+      <circle cx="50%" cy="70%" r="2"></circle>
+    </svg>
+  </div>
+
+  <div class="container position-relative py-5">
+    <h1 class="display-6 display-md-4 fw-bold text-shadow" style="color: #000;">
+      控時間，控節奏，控肉飯。
+    </h1>
+  
+
+    <div class="bg-dark bg-opacity-75 rounded p-4 d-inline-block">
+      <h2 class="mb-3">📅 今日時間倒數中</h2>
+      <p id="countdown" style="font-size: 2.5rem; font-weight: bold;">00 小時 00 分 00 秒</p>
+      <p class="text-white-50 mb-3">留給今天的時間，還有這麼多。</p>
+      <a href="#tools" class="btn btn-outline-light">開始今天的任務</a>
+    </div>
+    <div class="time-animated-background">
+      <canvas id="timeCanvas"></canvas>
+    </div>
+
+   
+  </div>
 </section>
 
 <!-- JavaScript 放在這裡 -->
@@ -471,6 +482,129 @@ setInterval(updateCountdown, 1000);
 updateCountdown();
 </script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("clockCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+  
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+  
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+  
+    let particles = [];
+  
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.radius = Math.random() * 2 + 1;
+        this.alpha = Math.random() * 0.5 + 0.2;
+        this.speedY = Math.random() * 0.5 + 0.1;
+      }
+  
+      update() {
+        this.y -= this.speedY;
+        if (this.y < 0) {
+          this.y = height;
+          this.x = Math.random() * width;
+        }
+      }
+  
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        ctx.fill();
+      }
+    }
+  
+    for (let i = 0; i < 100; i++) {
+      particles.push(new Particle());
+    }
+  
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let p of particles) {
+        p.update();
+        p.draw();
+      }
+      requestAnimationFrame(animate);
+    }
+  
+    animate();
+  });
+  </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("timeCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+  
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+  
+    resize();
+    window.addEventListener("resize", resize);
+  
+    let particles = [];
+    const colors = ['#FFDDC1', '#FFC1E3', '#C1E1FF', '#D1FFC1'];
+  
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+  
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = Math.random() * 0.5 - 0.25;
+        this.speedY = Math.random() * 0.5 - 0.25;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+      }
+  
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+          this.reset();
+        }
+      }
+  
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+  
+    for (let i = 0; i < 80; i++) {
+      particles.push(new Particle());
+    }
+  
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+  
+    animate();
+  });
+  </script>
+  
+  
 </body>
 
   
@@ -908,7 +1042,7 @@ updateCountdown();
     </div>
   </section>
 
-  <section class="collection bg-light position-relative py-5">
+  <section class="collection bg-light position-relative py-5" id="collection">
     <div class="container">
       <div class="row">
         <div class="title-xlarge text-uppercase txt-fx domino">Collection</div>
@@ -1353,7 +1487,7 @@ updateCountdown();
     </div>
   </section>
 
-  <section class="newsletter bg-light" style="background: url(images/pattern-bg.png) no-repeat;">
+  <section id="tools" class="newsletter bg-light" style="background: url(images/pattern-bg.png) no-repeat;">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-8 py-5 my-5">
