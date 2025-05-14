@@ -438,6 +438,43 @@
 
     </div>
   </nav>
+
+  <!-- 倒數區塊 -->
+<section id="time-remaining" class="text-center my-5">
+  <h2>今日剩餘時間</h2>
+  <p id="countdown" style="font-size: 2rem; font-weight: bold;"></p>
+</section>
+
+<!-- JavaScript 放在這裡 -->
+<script>
+function updateCountdown() {
+  const now = new Date();
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const diff = endOfDay - now;
+
+  if (diff <= 0) {
+    document.getElementById("countdown").innerText = "已結束，準備迎接新的一天！";
+    return;
+  }
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  document.getElementById("countdown").innerText =
+    `${hours} 小時 ${minutes} 分 ${seconds} 秒`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+</script>
+
+</body>
+
+  
+
   <section class="slogan-section" style="
   background-color: #f9f9f9;
   text-align: center;
@@ -477,7 +514,7 @@
             <div class="swiper-slide">
               <div class="banner-item image-zoom-effect">
                 <div class="image-holder">
-                  <a href="#">
+                  <a href="https://welly.tw/blog/wix">
                     <img src="images/banner-image-6.jpg" alt="product" class="img-fluid">
                   </a>
                 </div>
