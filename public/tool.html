@@ -85,38 +85,43 @@
     }
 
     async function analyzeByAI() {
-      const resultBox = document.getElementById("aiResult");
+  const resultBox = document.getElementById("aiResult");
 
-      const activeCells = Array.from(document.querySelectorAll(".time-cell.active"));
-      if (activeCells.length === 0) {
-        resultBox.textContent = "⚠️ 請先填入一些行程內容再分析喔！";
-        return;
-      }
+  const activeCells = Array.from(document.querySelectorAll(".time-cell.active"));
+  if (activeCells.length === 0) {
+    resultBox.textContent = "⚠️ 請先填入一些行程內容再分析喔！";
+    return;
+  }
 
-      const summary = activeCells.map(cell => {
-        const time = cell.dataset.time;
-        const content = cell.textContent.trim();
-        return `- ${time} ${content}`;
-      }).join("\n");
+  const summary = activeCells.map(cell => {
+    const time = cell.dataset.time;
+    const content = cell.textContent.trim();
+    return `- ${time} ${content}`;
+  }).join("\n");
 
-      const prompt = `以下是我的今日排程：\n${summary}\n\n請你檢查這樣的時間分配是否合理，有沒有安排過度密集、空檔過長、缺乏休息等問題，並提供優化建議。`;
+  const prompt = `以下是我的今日排程：\n${summary}\n\n請你檢查這樣的時間分配是否合理，有沒有安排過度密集、空檔過長、缺乏休息等問題，並提供優化建議。`;
+  console.log("🧪 傳給 AI 的 prompt：\n", prompt);
 
-      resultBox.textContent = "AI 分析中...";
+  resultBox.textContent = "AI 分析中...";
 
-      try {
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt })
-        });
-        const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content;
-        resultBox.textContent = reply || "⚠️ 沒有收到 AI 回覆，請重試。";
-      } catch (err) {
-        resultBox.textContent = "⚠️ 發生錯誤，請稍後再試。";
-        console.error(err);
-      }
-    }
+  try {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await res.json();
+    const aiReply = data.reply; // ✅ 正確：使用 reply 屬性
+    resultBox.textContent = aiReply || "⚠️ 沒有收到 AI 回覆，請重試。";
+
+  } catch (err) {
+    console.error("❌ 錯誤：", err);
+    resultBox.textContent = "⚠️ 發生錯誤，AI 無法回覆。";
+  }
+}
+
   </script>
 </body>
 </html>
+
