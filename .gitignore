@@ -1,0 +1,15 @@
+# 忽略環境變數檔案
+.env
+.env.local
+.env.*.local
+
+# 忽略 node_modules 資料夾（如果有用到 npm）
+node_modules/
+
+# 忽略打包出來的資料夾（如果有）
+dist/
+build/
+
+# macOS 或 VS Code 會自動產生的東西
+.DS_Store
+.vscode/
