@@ -177,11 +177,11 @@
       const prompt = `以下是我的今日排程：\n${summary}\n\n請你檢查這樣的時間分配是否合理，有沒有安排過度密集、空檔過長、缺乏休息等問題，並提供優化建議。`;
       resultBox.textContent = "AI 分析中...";
       try {
-        const res = await fetch("https://pengdouchenggithubio-production.up.railway.app/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt })
-        });
+        const res = await fetch("https://tool-server-k3y3.onrender.com/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
         const data = await res.json();
         resultBox.textContent = data.reply || "⚠️ 沒有收到 AI 回覆，請重試。";
       } catch (err) {
@@ -206,11 +206,11 @@
       costBox.textContent = "AI 分析中...";
 
       try {
-        const res = await fetch("https://pengdouchenggithubio-production.up.railway.app/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt })
-        });
+        const res = await fetch("https://tool-server-k3y3.onrender.com/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
         const data = await res.json();
         costBox.textContent = data.reply || "⚠️ 沒有收到 AI 回覆。";
       } catch (err) {
