@@ -16,6 +16,9 @@
   <link rel="stylesheet" type="text/css" href="css/vendor.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
   <link rel="stylesheet" type="text/css" href="style.css">
+  <!-- Fancybox (YouTube 彈窗) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1202,23 +1205,29 @@ updateCountdown();
 
   <section class="video py-5 overflow-hidden">
     <div class="container-fluid">
-      <div class="row">
-        <div class="video-content open-up" data-aos="zoom-out">
-          <div class="video-bg">
-            <img src="images/video-image.jpg" alt="video" class="video-image img-fluid">
-          </div>
-          <div class="video-player">
-            <a class="youtube" href="https://www.youtube.com/watch?v=tQsabbu4ZTA">
-              <svg width="24" height="24" viewBox="0 0 24 24">
-                <use xlink:href="#play"></use>
-              </svg>
-              <img src="images/text-pattern.png" alt="pattern" class="text-rotate">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="video-content text-center">
+            <a data-fancybox href="https://www.youtube.com/watch?v=tQsabbu4ZTA"
+               class="d-inline-block position-relative">
+              <!-- 封面圖片（沿用你的檔案） -->
+              <img src="images/video-image.jpg" alt="video" class="video-image img-fluid rounded shadow">
+  
+              <!-- 置中的播放按鈕 -->
+              <span class="position-absolute top-50 start-50 translate-middle">
+                <svg width="72" height="72" viewBox="0 0 64 64" fill="white"
+                     style="filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))">
+                  <circle cx="32" cy="32" r="32" fill="rgba(0,0,0,.5)"/>
+                  <polygon points="26,20 26,44 46,32" fill="#fff"/>
+                </svg>
+              </span>
             </a>
           </div>
         </div>
       </div>
     </div>
   </section>
+  
 
   <section class="testimonials py-5 bg-light">
     <div class="section-header text-center mt-5">
@@ -1390,7 +1399,7 @@ updateCountdown();
     <div id="izlu-section" class="container">
       <div class="d-flex flex-wrap justify-content-between align-items-center mt-5 mb-3">
         <h4 class="text-uppercase">自律專欄</h4>
-        <a href="tony.html" class="btn-link"></a>
+        <a href="tony.html" class="btn-link">觀看全部</a>
       </div>
       <div class="row">
         <div class="col-md-4">
@@ -1415,19 +1424,19 @@ updateCountdown();
         <div class="col-md-4">
           <article class="post-item">
             <div class="post-image">
-              <a href="euoy.html">
+              <a href="tony.html">
                 <img src="images/post-image2.jpg" alt="image" class="post-grid-image img-fluid">
               </a>
             </div>
             <div class="post-content d-flex flex-wrap gap-2 my-3">
               <div class="post-meta text-uppercase fs-6 text-secondary">
-                <span class="post-category">/</span>
-                <span class="meta-day"> sep 29, 2025</span>
+                <span class="post-category">標籤/</span>
+                <span class="meta-day"> jul 11, 2022</span>
               </div>
               <h5 class="post-title text-uppercase">
-                <a href="euoy.html">真正的自由，來自於對時間的掌控</a>
+                <a href="tony.html">標題</a>
               </h5>
-              <p>書籍到明星故事，看看他們如何用自律換來自由、自在與自信。</p>
+              <p>從書籍到明星故事，看看他們如何用自律換來自由、自在與自信。</p>
             </div>
           </article>
         </div>
