@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Supabase 測試</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body style="font-family: sans-serif; max-width: 640px; margin: 40px auto;">
+  <h2>登入 + 任務同步（task 表）</h2>
+
+  <section id="auth" style="display:block">
+    <input id="email" type="email" placeholder="Email" style="width:100%;padding:8px;margin:6px 0;">
+    <input id="password" type="password" placeholder="密碼" style="width:100%;padding:8px;margin:6px 0;">
+    <button onclick="register()">註冊</button>
+    <button onclick="login()">登入</button>
+    <p style="color:#666">註冊後請到信箱點驗證連結再登入。</p>
+  </section>
+
+  <section id="app" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>任務清單</h3>
+      <div><span id="who" style="margin-right:8px;color:#666"></span><button onclick="logout()">登出</button></div>
+    </div>
+    <div style="display:flex;gap:8px;margin:8px 0;">
+      <input id="newTitle" placeholder="輸入任務..." style="flex:1;padding:8px;">
+      <button onclick="addTask()">新增</button>
+    </div>
+    <ul id="list" style="list-style:none;padding:0;display:grid;gap:8px"></ul>
+    <p id="empty" style="color:#666"></p>
+  </section>
+
+  <script>
+    // ⬇️ 換成你的 Project URL 與 anon public key
+    const SUPABASE_URL = "https://rbtevdmunkjjevoeooli.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGV2ZG11bmtqamV2b2Vvb2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyNzMxMjIsImV4cCI6MjA3NTg0OTEyMn0.XjWId9AynP3TrJJEKIXZcsvmAW4kHLgH4dGDGqBH9dw";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // --- Auth ---
+    async function register(){
+      const email = emailInput().value, password = pwdInput().value;
+      const { error } = await sb.auth.signUp({ email, password });
+      if (error) return alert(error.message);
+      alert("註冊成功！請至信箱驗證後再登入。");
+    }
+    async function login(){
+      const email = emailInput().value, password = pwdInput().value;
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) return alert(error.message);
+      render();
+    }
+    async function logout(){ await sb.auth.signOut(); render(); }
+    async function user(){ return (await sb.auth.getUser()).data.user || null; }
+
+    // --- CRUD (表名是單數：task) ---
+    async function addTask(){
+      const u = await user(); if(!u) return alert("請先登入");
+      const title = document.querySelector("#newTitle").value.trim(); if(!title) return;
+      const { error } = await sb.from("task").insert([{ user_id: u.id, title }]);
+      if (error) return alert(error.message);
+      document.querySelector("#newTitle").value = "";
+      load();
+    }
+    async function toggle(id, done){
+      const { error } = await sb.from("task").update({ done }).eq("id", id);
+      if (error) return alert(error.message);
+      load();
+    }
+    async function removeTask(id){
+      const { error } = await sb.from("task").delete().eq("id", id);
+      if (error) return alert(error.message);
+      load();
+    }
+    async function load(){
+      const u = await user(); if(!u) return;
+      const { data, error } = await sb.from("task")
+        .select("*").eq("user_id", u.id).order("created_at", { ascending:false });
+      if (error) return alert(error.message);
+      const list = document.querySelector("#list"), empty = document.querySelector("#empty");
+      if (!data.length){ list.innerHTML = ""; empty.textContent = "目前沒有任務"; return; }
+      empty.textContent = "";
+      list.innerHTML = data.map(t => `
+        <li style="display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;border-radius:8px;padding:8px 12px;">
+          <label><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', this.checked)" />
+          <span style="${t.done?'text-decoration:line-through;opacity:.6':''}">${escapeHTML(t.title)}</span></label>
+          <button onclick="removeTask('${t.id}')">刪除</button>
+        </li>`).join("");
+    }
+
+    // --- UI state ---
+    async function render(){
+      const u = await user();
+      document.querySelector("#auth").style.display = u ? "none" : "block";
+      document.querySelector("#app").style.display  = u ? "block" : "none";
+      if (u){ document.querySelector("#who").textContent = u.email; load(); }
+    }
+    sb.auth.onAuthStateChange(() => render());
+    document.addEventListener("DOMContentLoaded", render);
+
+    // util
+    function emailInput(){ return document.querySelector("#email"); }
+    function pwdInput(){ return document.querySelector("#password"); }
+    function escapeHTML(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+  </script>
+</body>
+</html>
