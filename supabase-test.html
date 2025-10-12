@@ -105,5 +105,18 @@
     function pwdInput(){ return document.querySelector("#password"); }
     function escapeHTML(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
   </script>
+
+<button onclick="loginWithGoogle()">用 Google 登入</button>
+<script>
+async function loginWithGoogle(){
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: "https://你的-render-app.onrender.com/tool.html" }
+  });
+  if (error) alert(error.message);
+}
+</script>
+
+
 </body>
 </html>
