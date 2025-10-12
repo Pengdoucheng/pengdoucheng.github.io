@@ -43,11 +43,15 @@
       alert("註冊成功！請至信箱驗證後再登入。");
     }
     async function login(){
-      const email = emailInput().value, password = pwdInput().value;
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) return alert(error.message);
-      render();
-    }
+  const email = emailInput().value, password = pwdInput().value;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) return alert(error.message);
+
+  // ✅ 登入成功 → 跳轉到你的 tool.html
+  window.location.href = "https://tool-server-d695.onrender.com/tool.html";
+}
+
+    
     async function logout(){ await sb.auth.signOut(); render(); }
     async function user(){ return (await sb.auth.getUser()).data.user || null; }
 
