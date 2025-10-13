@@ -2,124 +2,359 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>Supabase 測試</title>
+  <title>登入 + 任務同步（支援訪客模式）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#0B0C10; --panel:#111318; --panel2:#0d0f14;
+      --text:#F3F4F6; --muted:#A8B3C5; --line:rgba(255,255,255,.08);
+      --primary:#6EA8FE; --primary2:#3F8CFF; --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+      --r:16px; --r-lg:22px; --shadow: 0 8px 28px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Inter, "PingFang TC","Noto Sans TC","Microsoft JhengHei", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 12% 10%, #182132 0%, transparent 55%),
+        radial-gradient(900px 700px at 85% 20%, #13233a 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg), #07080c);
+      display:grid; place-items:center; padding:24px;
+    }
+    .shell{width:min(100%, 1080px); display:grid; grid-template-columns: 1.1fr 1fr; gap:24px}
+    @media (max-width: 980px){ .shell{grid-template-columns:1fr} .hero{display:none} }
+    .hero{
+      border:1px solid var(--line); border-radius:var(--r-lg); padding:24px;
+      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+    .brand{display:flex; align-items:center; gap:12px; font-weight:800}
+    .brand-mark{ width:36px; height:36px; border-radius:12px;
+      background: conic-gradient(from 210deg, #3cf, #7c4dff, #3cf);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 8px 20px rgba(124,77,255,.35);
+    }
+    .hero h1{margin:.6rem 0 .25rem; font-size: clamp(28px, 3vw, 40px); line-height:1.15}
+    .muted{color:var(--muted)}
+    .cards{margin-top:16px; display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+    .card{border:1px solid var(--line); border-radius:18px; padding:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));}
+    .card h4{margin:0 0 6px; font-size:13px; letter-spacing:.3px; text-transform:uppercase; color:#cbd8ef}
+    .card p{margin:0; font-size:13px; color:var(--muted)}
+
+    .panel{
+      border:1px solid var(--line); border-radius:var(--r-lg); padding:22px; box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+    .section-title{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:6px 0 10px}
+    .tabs{display:flex; gap:8px; background:rgba(255,255,255,.06); padding:4px; border-radius:12px}
+    .tab{appearance:none; border:0; padding:8px 14px; border-radius:10px; font-weight:700; font-size:13px; color:var(--muted); cursor:pointer}
+    .tab[aria-selected="true"]{ background:#182030; color:#cfe3ff; box-shadow: inset 0 0 0 1px rgba(99,140,255,.25) }
+
+    label{font-size:13px; color:#c9d3e6; display:block; margin:10px 0 6px}
+    .ctl{display:flex; align-items:center; gap:8px; background:#0f1220; border:1px solid #22304a; border-radius:14px; padding:12px 14px}
+    input[type="email"], input[type="password"], input[type="text"]{
+      background:transparent; border:0; outline:0; color:var(--text); width:100%; font-size:16px;
+    }
+    .rows{display:grid; gap:10px}
+    .actions{display:grid; gap:10px; margin-top:12px}
+    .btn{appearance:none; border:0; border-radius:14px; padding:12px 14px; font-weight:800; letter-spacing:.3px; cursor:pointer}
+    .btn-primary{ background: linear-gradient(180deg, var(--primary), var(--primary2)); color:#fff; box-shadow: 0 10px 28px rgba(63,140,255,.28)}
+    .btn-line{ background:transparent; color:#cfe3ff; border:1px solid #2a3a5a}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .divider{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; color:var(--muted); font-size:12px; margin:8px 0}
+    .divider::before,.divider::after{content:""; height:1px; background:var(--line)}
+    .top-right{display:flex; align-items:center; gap:8px}
+    .pill{font-size:12px; padding:6px 10px; border:1px solid var(--line); border-radius:999px; color:#cbd8ef}
+    .rowline{border-top:1px solid var(--line); margin:16px 0}
+
+    /* 任務清單 */
+    .todo-head{display:flex; justify-content:space-between; align-items:center}
+    .bar{display:flex; gap:8px}
+    .ipt{flex:1}
+    .list{list-style:none; padding:0; margin:10px 0; display:grid; gap:8px}
+    .item{display:flex; justify-content:space-between; align-items:center; border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:#0d111b}
+    .item label{margin:0; display:flex; align-items:center; gap:8px}
+    .text-done{ text-decoration: line-through; opacity:.65 }
+
+    .note{font-size:13px; color:var(--muted)}
+    .who{color:var(--muted)}
+  </style>
 </head>
-<body style="font-family: sans-serif; max-width: 640px; margin: 40px auto;">
-  <h2>登入 + 任務同步（task 表）</h2>
+<body>
+  <div class="shell">
+    <!-- 左側介紹 -->
+    <aside class="hero">
+      <div class="brand"><div class="brand-mark" aria-hidden="true"></div><span>自律控肉飯 · 工具箱</span></div>
+      <h1>用更少力氣，做好更多事。</h1>
+      <p class="muted">登入可雲端同步；不想註冊也能「訪客模式」直接用，任務會儲存在本機。</p>
+      <div class="cards">
+        <div class="card"><h4>任務清單</h4><p>新增、完成、刪除，一目了然。</p></div>
+        <div class="card"><h4>雲端同步</h4><p>登入後讀寫 Supabase（task 表）。</p></div>
+        <div class="card"><h4>訪客模式</h4><p>不登入立即使用，資料存在瀏覽器。</p></div>
+        <div class="card"><h4>簡潔介面</h4><p>霧面質感、暗色背景、清晰焦點。</p></div>
+      </div>
+      <div class="rowline"></div>
+      <p class="note">© 2025 自律控肉飯（示範頁）。</p>
+    </aside>
 
-  <section id="auth" style="display:block">
-    <input id="email" type="email" placeholder="Email" style="width:100%;padding:8px;margin:6px 0;">
-    <input id="password" type="password" placeholder="密碼" style="width:100%;padding:8px;margin:6px 0;">
-    <button onclick="register()">註冊</button>
-    <button onclick="login()">登入</button>
-    <p style="color:#666">註冊後請到信箱點驗證連結再登入。</p>
-  </section>
+    <!-- 右側功能 -->
+    <main class="panel">
+      <!-- Auth -->
+      <section class="section-title">
+        <h2 style="margin:0">登入 / 註冊</h2>
+        <div class="tabs" role="tablist" aria-label="auth">
+          <button class="tab" id="tab-in"  aria-selected="true"  aria-controls="p-in">登入</button>
+          <button class="tab" id="tab-up"  aria-selected="false" aria-controls="p-up">註冊</button>
+        </div>
+      </section>
 
-  <section id="app" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3>任務清單</h3>
-      <div><span id="who" style="margin-right:8px;color:#666"></span><button onclick="logout()">登出</button></div>
-    </div>
-    <div style="display:flex;gap:8px;margin:8px 0;">
-      <input id="newTitle" placeholder="輸入任務..." style="flex:1;padding:8px;">
-      <button onclick="addTask()">新增</button>
-    </div>
-    <ul id="list" style="list-style:none;padding:0;display:grid;gap:8px"></ul>
-    <p id="empty" style="color:#666"></p>
-  </section>
+      <section id="auth" style="display:block">
+        <div id="p-in" role="tabpanel" aria-labelledby="tab-in">
+          <div class="rows">
+            <div>
+              <label for="email">電子郵件</label>
+              <div class="ctl"><input id="email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+            </div>
+            <div>
+              <label for="password">密碼</label>
+              <div class="ctl"><input id="password" type="password" placeholder="至少 6 碼" autocomplete="current-password"></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" id="btnLogin">登入</button>
+            <div class="grid2">
+              <button class="btn btn-line" id="btnGoogle">使用 Google 登入</button>
+              <button class="btn btn-line" id="btnGuest">直接使用（訪客模式）</button>
+            </div>
+            <p class="note">註冊後請到信箱完成驗證再登入。</p>
+          </div>
+        </div>
+
+        <div id="p-up" role="tabpanel" aria-labelledby="tab-up" hidden>
+          <div class="rows">
+            <div>
+              <label for="email2">電子郵件</label>
+              <div class="ctl"><input id="email2" type="email" placeholder="you@example.com" autocomplete="email"></div>
+            </div>
+            <div>
+              <label for="password2">設定密碼</label>
+              <div class="ctl"><input id="password2" type="password" placeholder="至少 6 碼" autocomplete="new-password"></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" id="btnSignup">建立帳號</button>
+            <button class="btn btn-line" id="btnGuest2">先用訪客模式</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- App -->
+      <section id="app" style="display:none">
+        <div class="todo-head">
+          <h3 style="margin:6px 0">任務清單</h3>
+          <div class="top-right">
+            <span class="who" id="who"></span>
+            <span class="pill" id="modePill">—</span>
+            <button class="btn btn-line" id="btnLogout">登出</button>
+          </div>
+        </div>
+
+        <div class="bar">
+          <div class="ctl ipt"><input id="newTitle" placeholder="輸入任務..." /></div>
+          <button class="btn btn-primary" id="btnAdd">新增</button>
+        </div>
+
+        <ul id="list" class="list"></ul>
+        <p id="empty" class="note"></p>
+      </section>
+    </main>
+  </div>
 
   <script>
-    // ⬇️ 換成你的 Project URL 與 anon public key
+    // ========= Supabase 設定（沿用你提供的 URL/KEY） =========
     const SUPABASE_URL = "https://rbtevdmunkjjevoeooli.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGV2ZG11bmtqamV2b2Vvb2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyNzMxMjIsImV4cCI6MjA3NTg0OTEyMn0.XjWId9AynP3TrJJEKIXZcsvmAW4kHLgH4dGDGqBH9dw";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- Auth ---
+    // ========= DOM 快捷 =========
+    const $  = (s, r=document)=>r.querySelector(s);
+    const $$ = (s, r=document)=>[...r.querySelectorAll(s)];
+    const emailInput = ()=>$("#email");
+    const pwdInput   = ()=>$("#password");
+
+    // ========= Tabs =========
+    const tabIn=$("#tab-in"), tabUp=$("#tab-up"), pIn=$("#p-in"), pUp=$("#p-up");
+    tabIn.addEventListener("click", e=>{e.preventDefault(); tabIn.setAttribute("aria-selected",true); tabUp.setAttribute("aria-selected",false); pIn.hidden=false; pUp.hidden=true;});
+    tabUp.addEventListener("click", e=>{e.preventDefault(); tabIn.setAttribute("aria-selected",false); tabUp.setAttribute("aria-selected",true); pIn.hidden=true; pUp.hidden=false;});
+
+    // ========= 訪客模式（本機儲存） =========
+    const GUEST_TASKS_KEY = "guestTasks_v1";
+    function ensureGuestId(){
+      if(!localStorage.getItem("guestId")){
+        const gid = "guest_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+        localStorage.setItem("guestId", gid);
+      }
+      localStorage.setItem("authMode","guest");
+    }
+    function isGuest(){ return localStorage.getItem("authMode")==="guest"; }
+    function readGuestTasks(){
+      try{ return JSON.parse(localStorage.getItem(GUEST_TASKS_KEY)||"[]"); }catch{ return []; }
+    }
+    function writeGuestTasks(arr){
+      localStorage.setItem(GUEST_TASKS_KEY, JSON.stringify(arr||[]));
+    }
+
+    // ========= Auth Actions =========
     async function register(){
-      const email = emailInput().value, password = pwdInput().value;
+      const email = $("#email2").value.trim(), password = $("#password2").value;
+      if(!email || !password) return alert("請輸入 Email 與密碼");
       const { error } = await sb.auth.signUp({ email, password });
-      if (error) return alert(error.message);
-      alert("註冊成功！請至信箱驗證後再登入。");
+      if(error) return alert(error.message);
+      alert("註冊成功！請到信箱驗證後再登入。");
+      tabIn.click();
+      $("#email").value = email;
     }
     async function login(){
-  const email = emailInput().value, password = pwdInput().value;
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) return alert(error.message);
+      const email = emailInput().value.trim(), password = pwdInput().value;
+      if(!email || !password) return alert("請輸入 Email 與密碼");
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) return alert(error.message);
+      // 不跳轉：直接重繪 UI
+      await render();
+    }
+    async function loginWithGoogle(){
+      // 不指定 redirectTo，使用預設回到此頁（需在 Supabase 網域允許）
+      const { error } = await sb.auth.signInWithOAuth({ provider: "google" });
+      if(error) alert(error.message);
+    }
+    async function logout(){
+      await sb.auth.signOut();
+      localStorage.removeItem("authMode"); // 回到未登入狀態
+      await render();
+    }
+    async function getUser(){
+      return (await sb.auth.getUser()).data.user || null;
+    }
 
-  // ✅ 登入成功 → 跳轉到你的 tool.html
-  window.location.href = "https://tool-server-d695.onrender.com/tool.html";
-}
-
-    
-    async function logout(){ await sb.auth.signOut(); render(); }
-    async function user(){ return (await sb.auth.getUser()).data.user || null; }
-
-    // --- CRUD (表名是單數：task) ---
+    // ========= 任務 CRUD：根據模式切換 =========
     async function addTask(){
-      const u = await user(); if(!u) return alert("請先登入");
-      const title = document.querySelector("#newTitle").value.trim(); if(!title) return;
+      const title = $("#newTitle").value.trim(); if(!title) return;
+      const u = await getUser();
+      if(isGuest() || !u){
+        // Guest: localStorage
+        const list = readGuestTasks();
+        list.unshift({ id: crypto.randomUUID(), title, done:false, created_at: new Date().toISOString() });
+        writeGuestTasks(list);
+        $("#newTitle").value = "";
+        paint(list);
+        return;
+      }
+      // User: Supabase
       const { error } = await sb.from("task").insert([{ user_id: u.id, title }]);
-      if (error) return alert(error.message);
-      document.querySelector("#newTitle").value = "";
-      load();
+      if(error) return alert(error.message);
+      $("#newTitle").value = "";
+      await load();
     }
-    async function toggle(id, done){
+
+    async function toggleTask(id, done){
+      const u = await getUser();
+      if(isGuest() || !u){
+        const list = readGuestTasks().map(t => t.id===id ? {...t, done} : t);
+        writeGuestTasks(list); paint(list); return;
+      }
       const { error } = await sb.from("task").update({ done }).eq("id", id);
-      if (error) return alert(error.message);
-      load();
+      if(error) return alert(error.message);
+      await load();
     }
+
     async function removeTask(id){
+      const u = await getUser();
+      if(isGuest() || !u){
+        const list = readGuestTasks().filter(t => t.id!==id);
+        writeGuestTasks(list); paint(list); return;
+      }
       const { error } = await sb.from("task").delete().eq("id", id);
-      if (error) return alert(error.message);
-      load();
+      if(error) return alert(error.message);
+      await load();
     }
+
     async function load(){
-      const u = await user(); if(!u) return;
+      const u = await getUser();
+      if(isGuest() || !u){
+        paint(readGuestTasks());
+        return;
+      }
       const { data, error } = await sb.from("task")
         .select("*").eq("user_id", u.id).order("created_at", { ascending:false });
-      if (error) return alert(error.message);
-      const list = document.querySelector("#list"), empty = document.querySelector("#empty");
-      if (!data.length){ list.innerHTML = ""; empty.textContent = "目前沒有任務"; return; }
+      if(error) return alert(error.message);
+      paint(data||[]);
+    }
+
+    // ========= UI 繪製 =========
+    function esc(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+    function paint(data){
+      const listEl = $("#list"), empty = $("#empty");
+      if(!data || !data.length){
+        listEl.innerHTML = ""; empty.textContent = "目前沒有任務"; return;
+      }
       empty.textContent = "";
-      list.innerHTML = data.map(t => `
-        <li style="display:flex;justify-content:space-between;align-items:center;border:1px solid #eee;border-radius:8px;padding:8px 12px;">
-          <label><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', this.checked)" />
-          <span style="${t.done?'text-decoration:line-through;opacity:.6':''}">${escapeHTML(t.title)}</span></label>
-          <button onclick="removeTask('${t.id}')">刪除</button>
-        </li>`).join("");
+      listEl.innerHTML = data.map(t => `
+        <li class="item">
+          <label>
+            <input type="checkbox" ${t.done?'checked':''}
+              onchange="toggleTask('${t.id}', this.checked)" />
+            <span class="${t.done?'text-done':''}">${esc(t.title)}</span>
+          </label>
+          <button class="btn btn-line" onclick="removeTask('${t.id}')">刪除</button>
+        </li>
+      `).join("");
     }
 
-    // --- UI state ---
+    // ========= 版面狀態 =========
     async function render(){
-      const u = await user();
-      document.querySelector("#auth").style.display = u ? "none" : "block";
-      document.querySelector("#app").style.display  = u ? "block" : "none";
-      if (u){ document.querySelector("#who").textContent = u.email; load(); }
+      const u = await getUser();
+      const authel = $("#auth"), app = $("#app"), who = $("#who"), pill=$("#modePill");
+      const inGuest = isGuest() || !u;
+
+      authel.style.display = inGuest && !isGuest() ? "block" : (u ? "none" : "block");
+      // 規則：若本機是訪客 → 顯示 app；若已登入 → 顯示 app；否則顯示 auth
+      if(isGuest() || u){ authel.style.display="none"; app.style.display="block"; } else { app.style.display="none"; }
+
+      if(isGuest()){
+        who.textContent = "訪客"; pill.textContent = "Guest";
+      }else if(u){
+        who.textContent = u.email || u.id; pill.textContent = "User";
+        localStorage.setItem("authMode","user");
+      }else{
+        who.textContent = ""; pill.textContent = "—";
+      }
+      await load();
     }
+
+    // ========= 綁定事件 =========
+    $("#btnSignup").addEventListener("click", register);
+    $("#btnLogin").addEventListener("click", login);
+    $("#btnGoogle").addEventListener("click", loginWithGoogle);
+    $("#btnGuest").addEventListener("click", ()=>{ ensureGuestId(); render(); });
+    $("#btnGuest2").addEventListener("click", ()=>{ ensureGuestId(); render(); });
+    $("#btnLogout").addEventListener("click", logout);
+    $("#btnAdd").addEventListener("click", addTask);
+    $("#newTitle").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); addTask(); } });
+
+    // 監聽登入狀態變更
     sb.auth.onAuthStateChange(() => render());
+
+    // 啟動
     document.addEventListener("DOMContentLoaded", render);
-
-    // util
-    function emailInput(){ return document.querySelector("#email"); }
-    function pwdInput(){ return document.querySelector("#password"); }
-    function escapeHTML(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+    // 若曾用訪客，直接顯示 app
+    if(localStorage.getItem("authMode")==="guest"){ $("#auth").style.display="none"; $("#app").style.display="block"; }
+    // 將函式暴露給 inline handler
+    window.toggleTask = toggleTask;
+    window.removeTask = removeTask;
   </script>
-
-<button onclick="loginWithGoogle()">用 Google 登入</button>
-<script>
-async function loginWithGoogle(){
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: "https://tool-server-d695.onrender.com/tool.html"
-    }
-  });
-  if (error) alert(error.message);
-}
-</script>
-
-
-
 </body>
 </html>
+
