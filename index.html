@@ -26,6 +26,15 @@
     href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Marcellus&display=swap"
     rel="stylesheet">
   <style>
+    
+    .swipe-hint {
+  text-align: center; /* 水平置中 */
+  color: #999;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
     /* 只在 billboard 區塊內，關閉超連結點擊 */
 #billboard .swiper a {
   pointer-events: none;      /* 禁止點擊 */
@@ -302,7 +311,7 @@
           <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
             aria-labelledby="offcanvasNavbarLabel">
             <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">總覽</h5>
               <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
                 aria-label="Close"></button>
             </div>
@@ -1236,6 +1245,7 @@ updateCountdown();
     </div>
   </section>
   
+  <p class="swipe-hint">名言佳句（可往右滑 →）</p>
 
   <section class="testimonials py-5 bg-light">
     <div class="section-header text-center mt-5">
