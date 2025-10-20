@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>反應時間小遊戲｜出現或消失就按空白鍵</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --fg:#e6edf3;
+      --muted:#9fb3c8;
+      --accent:#60d394;   /* 綠：可按 */
+      --warn:#ffb020;     /* 橘：等待 */
+      --bad:#ff6b6b;      /* 紅：偽起跑 */
+      --card:#111826;
+      --cardBorder:#203042;
+    }
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg:#f6f8fb;
+        --fg:#0f1720;
+        --muted:#516073;
+        --accent:#1fb672;
+        --warn:#c07a07;
+        --bad:#d93838;
+        --card:#ffffff;
+        --cardBorder:#e6ecf3;
+      }
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+    }
+    .wrap{
+      max-width:900px; margin:0 auto; padding:24px;
+      display:flex; flex-direction:column; gap:16px;
+    }
+    h1{ margin:0; font-size:26px; letter-spacing:0.5px; }
+    .subtitle{ color:var(--muted); font-size:14px }
+    .board{
+      border:1px solid var(--cardBorder);
+      border-radius:16px;
+      background:var(--card);
+      padding:16px;
+      display:grid;
+      grid-template-columns: 1fr 340px;
+      gap:16px;
+    }
+    @media (max-width: 860px){
+      .board{ grid-template-columns: 1fr; }
+    }
+    .stage{
+      aspect-ratio: 16/10;
+      border:1px dashed var(--cardBorder);
+      border-radius:12px;
+      display:grid; place-items:center;
+      position:relative;
+      overflow:hidden;
+      user-select:none;
+      cursor:pointer;
+    }
+    .status{
+      position:absolute; top:12px; left:12px;
+      font-size:14px; color:var(--muted);
+      background:rgba(0,0,0,0.12);
+      padding:6px 10px; border-radius:999px;
+    }
+    .stim{
+      width:min(40vmin,260px); height:min(40vmin,260px);
+      border-radius:20px;
+      display:grid; place-items:center;
+      font-weight:700;
+      transition: opacity 140ms ease, transform 140ms ease, background 140ms ease;
+      background:#32445a; color:#fff; opacity:0.85;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .stim.hidden{ opacity:0; transform: scale(0.92); pointer-events:none; }
+    .stim.ready{ background:var(--accent); }
+    .stim.wait{ background:var(--warn); }
+    .stim.false{ background:var(--bad); }
+    .panel{
+      border:1px solid var(--cardBorder);
+      border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:12px;
+      background:linear-gradient(180deg, rgba(96, 211, 148, .06), rgba(0,0,0,0));
+    }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+    .stat{ background:rgba(255,255,255,0.05); border:1px solid var(--cardBorder); border-radius:10px; padding:10px 12px; min-width:110px }
+    .stat .label{ color:var(--muted); font-size:12px }
+    .stat .val{ font-size:20px; font-weight:700 }
+    .btn{
+      border:1px solid var(--cardBorder); background:var(--card);
+      padding:10px 14px; border-radius:10px; color:var(--fg);
+      font-weight:600; cursor:pointer;
+      transition: transform .05s ease, background .2s ease;
+    }
+    .btn:hover{ background:rgba(255,255,255,.04) }
+    .btn:active{ transform: translateY(1px) }
+    .btn.primary{ background:var(--accent); border-color:transparent; color:#0b1a12 }
+    .hint{ color:var(--muted); font-size:13px; line-height:1.6 }
+    .log{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      background:#0c131d; color:#b6cff1;
+      border:1px solid var(--cardBorder); border-radius:10px; padding:10px; height:140px; overflow:auto;
+    }
+    @media (prefers-color-scheme: light) {
+      .log{ background:#f3f6fb; color:#22324a; }
+    }
+    .kbd{
+      display:inline-block; border:1px solid var(--cardBorder); padding:2px 6px; border-radius:6px; font-weight:700; background:var(--card); font-size:12px;
+    }
+    .bestTag{
+      display:inline-block; margin-left:6px; padding:2px 6px; border-radius:999px; background:rgba(96,211,148,.18); color:var(--accent); font-size:12px; font-weight:700
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <h1>反應時間小遊戲</h1>
+      <div class="subtitle">看到方塊 <strong>出現</strong> 或 <strong>消失</strong> 的瞬間，按下 <span class="kbd">Space</span>（或點一下畫面）。</div>
+    </div>
+
+    <div class="board" id="app">
+      <div class="stage" id="stage" aria-label="遊戲舞台（點擊可作答）">
+        <div class="status" id="status">按「開始」或按空白鍵開始</div>
+        <div class="stim hidden" id="stim">準備</div>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <button class="btn primary" id="startBtn">開始一回合</button>
+          <button class="btn" id="resetBestBtn">清除本機最佳</button>
+        </div>
+
+        <div class="row">
+          <div class="stat">
+            <div class="label">本次成績</div>
+            <div class="val" id="last">— ms</div>
+          </div>
+          <div class="stat">
+            <div class="label">平均（本場）</div>
+            <div class="val" id="avg">— ms</div>
+          </div>
+          <div class="stat">
+            <div class="label">回合數</div>
+            <div class="val" id="rounds">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">本機最佳</div>
+            <div class="val" id="best">— ms</div>
+          </div>
+        </div>
+
+        <div class="hint">
+          流程：按下「開始」→ 進入等待（不可按）→ 方塊<em>出現或消失</em> → 立刻按 <span class="kbd">Space</span> 或點擊 / 觸控。<br/>
+          偽起跑（還沒變化就按）會被判定失誤。
+        </div>
+
+        <div class="log" id="log" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      // 狀態機
+      const State = {
+        IDLE: 'idle',
+        WAITING: 'waiting',
+        READY: 'ready',       // 刺激已變化，可按
+        RESULT: 'result',
+        FALSE: 'falseStart'
+      };
+
+      const stage = document.getElementById('stage');
+      const stim  = document.getElementById('stim');
+      const statusEl = document.getElementById('status');
+      const startBtn = document.getElementById('startBtn');
+      const resetBestBtn = document.getElementById('resetBestBtn');
+
+      const lastEl = document.getElementById('last');
+      const avgEl  = document.getElementById('avg');
+      const roundsEl = document.getElementById('rounds');
+      const bestEl = document.getElementById('best');
+      const logEl = document.getElementById('log');
+
+      let state = State.IDLE;
+      let trialStartAt = 0;      // 進入 WAITING 的時間（僅供參考）
+      let readyAt = 0;           // 刺激變化的時間（計時起點）
+      let timer = null;
+      let currentMode = null;    // 'appear' | 'disappear'
+      let results = [];          // 本場成績（毫秒）
+      const BEST_KEY = 'reaction_best_ms';
+
+      // 初始化本機最佳
+      updateBestUI(loadBest());
+
+      // 工具：亂數延遲（1200~3000ms）
+      function randomDelay() {
+        return 1200 + Math.random() * 1800;
+      }
+      // 工具：隨機模式
+      function randomMode() {
+        return Math.random() < 0.5 ? 'appear' : 'disappear';
+      }
+      // UI 輔助
+      function setStatus(msg){ statusEl.textContent = msg; }
+      function setStimVisibility(show){
+        stim.classList.toggle('hidden', !show);
+      }
+      function setStimStyle(cls){
+        stim.classList.remove('ready','wait','false');
+        if (cls) stim.classList.add(cls);
+      }
+      function log(msg){
+        const time = new Date().toLocaleTimeString();
+        logEl.innerHTML = `[${time}] ${msg}<br>` + logEl.innerHTML;
+      }
+      function fmt(ms){
+        return Math.round(ms);
+      }
+      function loadBest(){
+        const v = localStorage.getItem(BEST_KEY);
+        return v ? Number(v) : null;
+      }
+      function saveBest(ms){
+        localStorage.setItem(BEST_KEY, String(ms));
+      }
+      function updateBestUI(best){
+        if (best == null || !isFinite(best)) bestEl.innerHTML = '— ms';
+        else bestEl.innerHTML = `${fmt(best)} ms`;
+      }
+      function updateRoundStats(){
+        roundsEl.textContent = String(results.length);
+        if (results.length === 0) {
+          avgEl.textContent = '— ms';
+        } else {
+          const avg = results.reduce((a,b)=>a+b,0)/results.length;
+          avgEl.textContent = `${fmt(avg)} ms`;
+        }
+      }
+
+      function resetRoundUI(){
+        setStimVisibility(false);
+        setStimStyle(null);
+        stim.textContent = '準備';
+        setStatus('按「開始」或按空白鍵開始');
+        state = State.IDLE;
+      }
+
+      // 開始一回合
+      function startTrial(){
+        if (state === State.WAITING) return; // 已在等待就不重覆
+        clearTimeout(timer);
+        state = State.WAITING;
+        currentMode = randomMode();
+        setStimStyle('wait');
+
+        if (currentMode === 'appear'){
+          // 先隱藏，等待後「出現」
+          setStimVisibility(false);
+          setStatus('等待中…看到方塊「出現」再按（不可先按）');
+        } else {
+          // 先顯示，等待後「消失」
+          setStimVisibility(true);
+          stim.textContent = '消失時按';
+          setStatus('等待中…看到方塊「消失」再按（不可先按）');
+        }
+
+        trialStartAt = performance.now();
+        timer = setTimeout(()=>{
+          // 進入 READY：刺激變化發生
+          state = State.READY;
+          readyAt = performance.now();
+          if (currentMode === 'appear'){
+            setStimVisibility(true);
+            stim.textContent = '現在！';
+          } else {
+            setStimVisibility(false);
+          }
+          setStimStyle('ready');
+          setStatus('快按！空白鍵 / 點擊');
+        }, randomDelay());
+      }
+
+      // 偽起跑
+      function falseStart(){
+        clearTimeout(timer);
+        state = State.FALSE;
+        setStimStyle('false');
+        setStimVisibility(true);
+        stim.textContent = '太快了！';
+        setStatus('偽起跑：尚未出現/消失就按。按開始再試一次。');
+        log('偽起跑（提前按下）');
+      }
+
+      // 作答
+      function answer(){
+        if (state === State.WAITING){
+          // 還沒變化就按：偽起跑
+          falseStart();
+          return;
+        }
+        if (state !== State.READY) return;
+
+        const rt = performance.now() - readyAt;
+        const ms = Math.max(1, rt); // 安全下限
+        state = State.RESULT;
+
+        setStimStyle(null);
+        setStimVisibility(true);
+        stim.textContent = `${fmt(ms)} ms`;
+        setStatus('按「開始」再來一局，或空白鍵直接重來');
+
+        results.push(ms);
+        lastEl.innerHTML = `${fmt(ms)} ms` + bestBadgeIf(ms);
+
+        // 更新本機最佳
+        const best = loadBest();
+        if (best == null || ms < best){
+          saveBest(ms);
+          updateBestUI(ms);
+          log(`新本機最佳：${fmt(ms)} ms 🎉`);
+        } else {
+          updateBestUI(best);
+          log(`本次：${fmt(ms)} ms`);
+        }
+        updateRoundStats();
+      }
+
+      function bestBadgeIf(ms){
+        const best = loadBest();
+        if (best == null || ms < best) {
+          return ` <span class="bestTag">BEST</span>`;
+        }
+        return '';
+      }
+
+      // 事件
+      startBtn.addEventListener('click', ()=>{
+        if (state === State.READY){ answer(); return; }
+        startTrial();
+      });
+
+      resetBestBtn.addEventListener('click', ()=>{
+        localStorage.removeItem(BEST_KEY);
+        updateBestUI(null);
+        log('已清除本機最佳紀錄');
+      });
+
+      // 空白鍵控制：開始 / 作答 / 重來
+      window.addEventListener('keydown', (e)=>{
+        if (e.code === 'Space' || e.key === ' ') {
+          e.preventDefault();
+          if (state === State.IDLE || state === State.RESULT || state === State.FALSE){
+            startTrial();
+          } else if (state === State.WAITING){
+            falseStart();
+          } else if (state === State.READY){
+            answer();
+          }
+        }
+      });
+
+      // 點擊 / 觸控舞台：同作答行為
+      stage.addEventListener('pointerdown', ()=>{
+        if (state === State.IDLE || state === State.RESULT || state === State.FALSE){
+          startTrial();
+        } else if (state === State.WAITING){
+          falseStart();
+        } else if (state === State.READY){
+          answer();
+        }
+      });
+
+      // 初始
+      resetRoundUI();
+      setStatus('按「開始」或空白鍵開始');
+    })();
+  </script>
+</body>
+</html>
