@@ -393,9 +393,16 @@
           </div>
           <div class="task-footer">
             <span class="task-tag">模式：AI 節奏</span>
-            <a class="task-link" href="supabase-test.html" data-target="ai-tool">進入工具</a>
+        
+            <!-- 改這裡！！！ -->
+            <a class="task-link"
+               href="#"
+               data-url="supabase-test.html"
+               data-title="AI 排程工具">進入工具</a>
+        
           </div>
         </article>
+        
 
         <!-- 卡片 2：番茄鐘專注模式 -->
         <article class="task-card">
@@ -510,6 +517,38 @@
         console.log('點擊了任務卡片：', target);
       });
     });
+    const overlay = document.getElementById('overlay');
+const frame = document.getElementById('overlay-frame');
+const title = document.getElementById('overlay-title');
+
+// 打開視窗
+function openOverlay(label, url) {
+  title.textContent = label;
+  frame.src = url;
+  overlay.classList.add('show');
+}
+
+// 關閉視窗
+document.getElementById('overlay-close').onclick = () => {
+  overlay.classList.remove('show');
+};
+
+// 點按空白處關閉
+overlay.onclick = (e) => {
+  if (e.target === overlay) overlay.classList.remove('show');
+};
+
+// 綁定所有 task-link
+document.querySelectorAll('.task-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    const url = link.getAttribute('data-url');
+    const label = link.getAttribute('data-title') 
+               || link.closest('.task-card').querySelector('.task-title').textContent;
+    openOverlay(label, url);
+  });
+});
+
   </script>
 </body>
 </html>
