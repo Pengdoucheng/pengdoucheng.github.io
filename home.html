@@ -326,6 +326,80 @@
         grid-template-columns: minmax(0, 1fr);
       }
     }
+        /* 浮動視窗樣式 */
+        .overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 50;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .overlay-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(4px);
+    }
+
+    .overlay-dialog {
+      position: relative;
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 26px 55px rgba(15, 23, 42, 0.45);
+      max-width: 960px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin: 0 12px;
+    }
+
+    .overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+      font-size: 13px;
+    }
+
+    .overlay-close {
+      border: none;
+      background: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 999px;
+    }
+
+    .overlay-close:hover {
+      background: #f4f4f5;
+    }
+
+    .overlay-frame {
+      border: none;
+      width: 100%;
+      height: 70vh;
+      background: #f9fafb;
+    }
+
+    @media (max-width: 640px) {
+      .overlay-dialog {
+        border-radius: 16px;
+        max-height: 88vh;
+      }
+      .overlay-frame {
+        height: 72vh;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -419,7 +493,11 @@
           </div>
           <div class="task-footer">
             <span class="task-tag">模式：專注練習</span>
-            <a class="task-link" href="pomodoro.html" data-target="pomodoro">開始專注</a>
+            <a class="task-link"
+            href="#"
+            data-url="pomodoro.html"
+            data-title="番茄鐘 · 深度專注">開始專注</a>
+         
           </div>
         </article>
 
@@ -505,50 +583,60 @@
       ※ 按鈕目前預留為 <span>data-target</span> 屬性，你可以在 JavaScript 裡依照 data-target 轉跳到對應頁面或開啟新視窗。
     </p>
   </div>
+    <!-- 浮動視窗：疊在同一頁上 -->
+    <div id="overlay" class="overlay">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-dialog">
+        <div class="overlay-header">
+          <span id="overlay-title">載入中…</span>
+          <button id="overlay-close" class="overlay-close">✕</button>
+        </div>
+        <iframe id="overlay-frame" class="overlay-frame" src="about:blank" loading="lazy"></iframe>
+      </div>
+    </div>
+  
 
-  <script>
-    // 範例：你之後可以改成實際轉跳網址
-    document.querySelectorAll('.task-link').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = link.getAttribute('data-target');
-        // TODO: 在這裡依照 target 做對應轉跳，例如：
-        // if (target === 'ai-tool') window.location.href = '/tool.html';
-        console.log('點擊了任務卡片：', target);
+    <script>
+      const overlay = document.getElementById('overlay');
+      const frame = document.getElementById('overlay-frame');
+      const title = document.getElementById('overlay-title');
+      const btnClose = document.getElementById('overlay-close');
+  
+      function openOverlay(label, url) {
+        if (!url) return; // 沒給 url 就不做事
+        title.textContent = label || '載入中…';
+        frame.src = url;
+        overlay.classList.add('show');
+      }
+  
+      function closeOverlay() {
+        overlay.classList.remove('show');
+        // 視情況決定要不要清空 src（清空會讓內頁重載）
+        // frame.src = 'about:blank';
+      }
+  
+      // 關閉按鈕
+      btnClose.addEventListener('click', closeOverlay);
+  
+      // 點背景關閉
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay || e.target.classList.contains('overlay-backdrop')) {
+          closeOverlay();
+        }
       });
-    });
-    const overlay = document.getElementById('overlay');
-const frame = document.getElementById('overlay-frame');
-const title = document.getElementById('overlay-title');
-
-// 打開視窗
-function openOverlay(label, url) {
-  title.textContent = label;
-  frame.src = url;
-  overlay.classList.add('show');
-}
-
-// 關閉視窗
-document.getElementById('overlay-close').onclick = () => {
-  overlay.classList.remove('show');
-};
-
-// 點按空白處關閉
-overlay.onclick = (e) => {
-  if (e.target === overlay) overlay.classList.remove('show');
-};
-
-// 綁定所有 task-link
-document.querySelectorAll('.task-link').forEach(link => {
-  link.addEventListener('click', function(e) {
-    e.preventDefault();
-    const url = link.getAttribute('data-url');
-    const label = link.getAttribute('data-title') 
-               || link.closest('.task-card').querySelector('.task-title').textContent;
-    openOverlay(label, url);
-  });
-});
-
-  </script>
+  
+      // 綁定卡片按鈕
+      document.querySelectorAll('.task-link').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          const url = link.getAttribute('data-url');
+          const label =
+            link.getAttribute('data-title') ||
+            (link.closest('.task-card')?.querySelector('.task-title')?.textContent || '');
+          openOverlay(label, url);
+        });
+      });
+    </script>
+  
 </body>
 </html>
