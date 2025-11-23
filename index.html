@@ -61,8 +61,7 @@
 }
 
 
-   
-/* ====== 自律控肉飯：紅黑白主視覺（V2） ====== */
+   /* ====== 自律控肉飯：紅黑白主視覺（V2） ====== */
 :root {
   --brand-red: #e10600;
   --brand-black: #111111;
@@ -380,16 +379,6 @@ section.bg-light,
   .hero-landing {
     padding-top: 1.5rem;
   }
-  .hero-main-title {
-    font-size: 1.9rem;
-  }
-  .hero-subtitle {
-    letter-spacing: 0.18em;
-  }
-  .countdown-panel {
-    margin-top: 1.5rem;
-  }
-}
   .hero-main-title {
     font-size: 1.9rem;
   }
@@ -769,11 +758,11 @@ section.bg-light,
   
 <section id="home-hero" class="hero-landing position-relative overflow-hidden">
   <canvas id="timeCanvas" class="hero-noise"></canvas>
-
   <div class="hero-stripe"></div>
 
   <div class="container py-5 position-relative hero-shell">
     <div class="row align-items-center g-4 g-lg-5">
+      <!-- 左側文字區 -->
       <div class="col-lg-7 text-lg-start text-center">
         <p class="hero-eyebrow mb-2">自律控肉飯 · GRAD PROJECT</p>
         <h1 class="hero-main-title mb-3">
@@ -789,6 +778,7 @@ section.bg-light,
         </p>
       </div>
 
+      <!-- 右側倒數卡片 -->
       <div class="col-lg-5">
         <div class="countdown-panel ms-lg-auto">
           <div class="countdown-label text-uppercase">Today Timer</div>
