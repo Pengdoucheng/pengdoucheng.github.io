@@ -62,10 +62,9 @@
 
 
    
-/* ====== 自律控肉飯：紅黑白主視覺 ====== */
+/* ====== 自律控肉飯：紅黑白主視覺（V2） ====== */
 :root {
   --brand-red: #e10600;
-  --brand-red-dark: #b00000;
   --brand-black: #111111;
   --brand-gray: #f5f5f5;
 }
@@ -76,11 +75,11 @@ body.homepage {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC", "PingFang TC", sans-serif;
 }
 
-/* Navbar */
+/* Navbar：白底黑線＋紅色下劃線 */
 .navbar {
   background-color: #ffffff !important;
-  border-bottom: 3px solid var(--brand-black);
-  letter-spacing: 0.15em;
+  border-bottom: 2px solid var(--brand-black);
+  letter-spacing: 0.16em;
 }
 
 .navbar-brand.text-white {
@@ -101,7 +100,7 @@ body.homepage {
   width: 0;
   height: 2px;
   background-color: var(--brand-red);
-  transition: width 0.25s ease-out;
+  transition: width 0.22s ease-out;
 }
 
 .navbar .nav-link:hover::after,
@@ -109,7 +108,7 @@ body.homepage {
   width: 100%;
 }
 
-/* Buttons & badges */
+/* Buttons & badges：統一紅色 */
 .btn-primary,
 .btn.btn-primary {
   background-color: var(--brand-red) !important;
@@ -119,8 +118,8 @@ body.homepage {
 
 .btn-primary:hover,
 .btn.btn-primary:hover {
-  background-color: var(--brand-red-dark) !important;
-  border-color: var(--brand-red-dark) !important;
+  background-color: #b00000 !important;
+  border-color: #b00000 !important;
 }
 
 .badge.bg-primary {
@@ -138,15 +137,29 @@ body.homepage {
   min-height: 70vh;
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 .hero-shell {
   z-index: 2;
 }
 
+/* 左側淡紅色大色塊，拉出視覺重心（無漸層） */
+.hero-landing::before {
+  content: "";
+  position: absolute;
+  top: 14%;
+  left: -40px;
+  width: 190px;
+  height: 72%;
+  background-color: var(--brand-red);
+  opacity: 0.06;
+  z-index: 1;
+}
+
 .hero-eyebrow {
-  font-size: 0.85rem;
-  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--brand-red);
   font-weight: 700;
@@ -155,25 +168,25 @@ body.homepage {
 .hero-main-title {
   font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   line-height: 1.3;
 }
 
 .hero-divider {
-  width: 140px;
+  width: 150px;
   height: 3px;
   background-color: var(--brand-black);
 }
 
 .hero-subtitle {
   font-weight: 700;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.32em;
   font-size: 0.95rem;
 }
 
 .hero-text {
   max-width: 34rem;
-  color: #555555;
+  color: #444444;
   line-height: 1.7;
 }
 
@@ -183,34 +196,37 @@ body.homepage {
   color: #ffffff;
   border-radius: 18px;
   padding: 1.75rem 1.75rem 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
   position: relative;
   overflow: hidden;
 }
 
+/* 紅色框線＋黑底，無漸層 */
 .countdown-panel::before {
   content: "";
   position: absolute;
-  inset: -2px;
+  inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, var(--brand-red), #ffffff, var(--brand-red));
-  opacity: 0.5;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 3px solid var(--brand-red);
+  border-left: 3px solid var(--brand-red);
   z-index: -1;
 }
 
 .countdown-panel::after {
   content: "";
   position: absolute;
-  inset: 3px;
+  inset: 4px;
   border-radius: inherit;
   background-color: #000000;
-  z-index: -1;
+  z-index: -2;
 }
 
 .countdown-label {
   font-size: 0.8rem;
   letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
 }
 
 .countdown-time {
@@ -222,22 +238,23 @@ body.homepage {
 
 .countdown-progress {
   width: 100%;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.12);
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   overflow: hidden;
 }
 
+/* 進度條改為實心紅色 */
 .countdown-progress-fill {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, var(--brand-red), #ff5252);
+  background-color: var(--brand-red);
   transition: width 0.35s ease-out;
 }
 
 .countdown-note {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .btn-countdown {
@@ -258,7 +275,7 @@ body.homepage {
   border-color: var(--brand-red);
 }
 
-/* Background noise & stripe */
+/* Background canvas */
 .hero-noise {
   position: absolute;
   inset: 0;
@@ -266,6 +283,7 @@ body.homepage {
   height: 100%;
   z-index: 0;
   pointer-events: none;
+  opacity: 0.42;
 }
 
 .hero-stripe {
@@ -273,17 +291,83 @@ body.homepage {
   left: 0;
   right: 0;
   top: 0;
-  height: 10px;
-  background: linear-gradient(90deg, var(--brand-red) 0%, #000000 50%, var(--brand-red) 100%);
-  z-index: 1;
+  height: 6px;
+  background-color: var(--brand-red);
+  z-index: 3;
 }
 
-/* Cards & light sections */
+/* Collection（關於我們）區塊：左右切版＋黑框紅點綴 */
+#collection .collection-item {
+  border-top: 2px solid var(--brand-black);
+  border-bottom: 2px solid var(--brand-black);
+  padding-block: 3rem;
+  margin-top: 3rem;
+  background-color: #ffffff;
+}
+
+#collection .image-holder img {
+  border-radius: 18px;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.18);
+}
+
+#collection .collection-content {
+  position: relative;
+}
+
+#collection .collection-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 56px;
+  height: 3px;
+  background-color: var(--brand-red);
+}
+
+#collection .element-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+#collection p {
+  line-height: 1.9;
+  color: #333333;
+}
+
+/* Features（四個小標） */
+section.features {
+  border-top: 2px solid var(--brand-black);
+  border-bottom: 2px solid var(--brand-black);
+  background-color: #ffffff;
+}
+
+section.features svg {
+  stroke: var(--brand-black);
+  color: var(--brand-black);
+}
+
+section.features h4.element-title {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+}
+
+section.features p {
+  font-size: 0.9rem;
+  color: #444444;
+}
+
+/* light 區塊背景統一 */
 section.bg-light,
 .bg-light {
   background-color: var(--brand-gray) !important;
 }
 
+/* 卡片圓角 */
 .card,
 .product-item,
 .banner-item {
@@ -296,6 +380,16 @@ section.bg-light,
   .hero-landing {
     padding-top: 1.5rem;
   }
+  .hero-main-title {
+    font-size: 1.9rem;
+  }
+  .hero-subtitle {
+    letter-spacing: 0.18em;
+  }
+  .countdown-panel {
+    margin-top: 1.5rem;
+  }
+}
   .hero-main-title {
     font-size: 1.9rem;
   }
