@@ -415,8 +415,9 @@
       </div>
       <div class="topbar-right">
         <span class="pill">beta · 時間自律工具</span>
-        <span>今天是整理自己的一天</span>
+        <a href="login.html" class="btn-ghost">登入 / 管理帳號</a>
       </div>
+      
     </header>
 
     <!-- Hero 區 -->
@@ -470,11 +471,10 @@
         
             <!-- 改這裡！！！ -->
             <a class="task-link"
-               href="#"
-               data-url="supabase-test.html"
-               data-title="AI 排程工具">進入工具</a>
-        
-          </div>
+            href="#"
+            data-url="https://tool-server-d695.onrender.com/tool.html"
+            data-title="AI 排程工具">進入工具</a>
+         
         </article>
         
 
@@ -637,6 +637,35 @@
         });
       });
     </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const sb = supabase.createClient(
+      "https://rbtevdmunkjjevoeooli.supabase.co",
+      "你的 anon key"
+    );
+  
+    // 你的 openOverlay 邏輯前面，加這個判斷
+    document.querySelectorAll('.task-link').forEach(link => {
+      link.addEventListener('click', async function(e) {
+        e.preventDefault();
+  
+        const requireLogin = link.getAttribute('data-require-login') === 'true';
+        const { data: { user } } = await sb.auth.getUser();
+  
+        if (requireLogin && !user) {
+          if (confirm("要先登入才能使用這個工具，現在要去登入嗎？")) {
+            window.location.href = "login.html";
+          }
+          return;
+        }
+  
+        const url = link.getAttribute('data-url');
+        const label = link.getAttribute('data-title') 
+                   || link.closest('.task-card').querySelector('.task-title').textContent;
+        openOverlay(label, url);
+      });
+    });
+  </script>
   
 </body>
 </html>
