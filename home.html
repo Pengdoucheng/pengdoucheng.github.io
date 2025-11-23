@@ -641,7 +641,7 @@
   <script>
     const sb = supabase.createClient(
       "https://rbtevdmunkjjevoeooli.supabase.co",
-      "你的 anon key"
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGV2ZG11bmtqamV2b2Vvb2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyNzMxMjIsImV4cCI6MjA3NTg0OTEyMn0.XjWId9AynP3TrJJEKIXZcsvmAW4kHLgH4dGDGqBH9dw"
     );
   
     // 你的 openOverlay 邏輯前面，加這個判斷
@@ -654,7 +654,7 @@
   
         if (requireLogin && !user) {
           if (confirm("要先登入才能使用這個工具，現在要去登入嗎？")) {
-            window.location.href = "login.html";
+            window.location.href = "supabase-test.html";
           }
           return;
         }
