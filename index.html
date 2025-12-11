@@ -390,6 +390,51 @@ section.bg-light,
   }
 }
 
+/* 隱藏 Swiper 分頁點 和 左右箭頭 */
+#new-arrival .swiper-pagination,
+#new-arrival .icon-arrow {
+  display: none !important;
+}
+
+/* 把 section 本身的 overflow-hidden 取消 */
+#new-arrival {
+  overflow: visible !important;
+}
+
+/* 整個區塊不要被裁掉 */
+#new-arrival .product-swiper {
+  overflow: visible !important;
+}
+
+/* 把 swiper-wrapper 變成正常單行 flex */
+#new-arrival .product-swiper .swiper-wrapper {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: space-between;
+  width: 100% !important;
+  transform: none !important;
+}
+
+/* 讓 5 張圖片平均分配在一排 */
+#new-arrival .product-swiper .swiper-slide {
+  flex: 0 0 20% !important;
+  max-width: 20% !important;
+  margin-right: 0 !important;
+}
+
+/* 統一圖片比例，不裁切（完整露出） */
+#new-arrival .product-image {
+  width: 100% !important;
+  height: 280px;
+  object-fit: contain;
+  background: #ffffff;
+  display: block;
+}
+
+
+
+
+
 </style>
       
     
